@@ -7,7 +7,7 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LIVE="${CLAUDE_SETTINGS:-$HOME/.claude/settings.json}"
-OUT="$LIVE.merged"
+OUT="${MERGE_OUT:-$LIVE.merged}"
 EMPTY="$(mktemp)"
 trap 'rm -f "$EMPTY"' EXIT
 printf '{}\n' > "$EMPTY"

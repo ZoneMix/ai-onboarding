@@ -1,0 +1,28 @@
+Usage: ./setup.sh [options]
+
+With no options, opens a menu: import everything, pick and choose, explore, or set up a
+project folder.
+
+Options (for agents, scripts, or people who know what they want):
+  --all              Import everything: rules, hooks, settings, skills
+  --only a,b         Import only these items (see --list for the names)
+  --project DIR      Also set up AGENTS.md and CLAUDE.md in DIR
+  --list             List the items and exit
+  --explore NAME     Describe one item and list its files, then exit
+  --dry-run          Show what would change, change nothing
+  --yes, -y          Take the default answer to every question
+  -h, --help         Show this help
+
+Items: rules, instructions, hooks, settings, skills, project
+  "instructions" is a one-file version of "rules"; pick one of the two.
+
+Defaults are safe: an existing CLAUDE.md is kept and ours is saved next to it, every replaced
+file gets a timestamped .bak copy, and settings are merged, never overwritten.
+
+Environment: CLAUDE_CONFIG_DIR (default ~/.claude), HOOK_DEST (default ~/.local/bin).
+
+Examples:
+  ./setup.sh
+  ./setup.sh --all --dry-run
+  ./setup.sh --only rules,hooks,settings --yes
+  ./setup.sh --project ~/code/my-app

@@ -1,27 +1,65 @@
 # ai-onboarding
 
-My AI coding setup, written so an agent can reproduce it. Point Claude Code (or another
-coding agent) at this repo and tell it:
+My AI coding setup, packaged so you can take all of it or just the parts you like: the
+working rules I give coding agents, hooks that stop the mistakes they make most, a couple of
+skills, and a simple way to set up instruction files in each project.
 
-> Read AGENTS.md in this repo and set up my machine the same way.
+## Quick start
 
-It will read the rules, install the guard hooks, merge the settings and set up instruction
-files, showing you each change before it replaces anything.
+```bash
+git clone https://github.com/ZoneMix/ai-onboarding.git
+```
 
-## What you get
+```bash
+cd ai-onboarding && ./setup.sh
+```
 
-- **Working rules** (`rules/`): how the agent communicates, writes code, uses git and the
-  shell, handles secrets, deploys, and keeps visuals accessible.
-- **Guard hooks** (`claude/hooks/`): block heredocs, force-pushes, `git add -A`, deep
-  `rm -rf` mistakes, reading private SSH keys, and secrets in edits or commits.
-- **Instruction-file layout** (`templates/`): `AGENTS.md` as the single source of truth per
-  project, with a one-line `CLAUDE.md` that imports it.
-- **Skills** (`skills/`): a lean-code gate and an instruction-file audit.
+The menu lets you import everything, pick and choose, or read through what's here first.
+Nothing is replaced without a backup, and an existing `CLAUDE.md` is never overwritten unless
+you say so.
+
+Prefer to let an agent do it? Open Claude Code (or another coding agent) in the cloned folder
+and say:
+
+> Read AGENTS.md and set up my machine from it.
+
+It will show you the options, preview the changes and install what you choose.
+
+## What's inside
+
+- **Rules** (`rules/`): how the agent communicates, works on its own, writes code, uses git
+  and the shell, handles secrets, deploys, writes and designs, and keeps visuals accessible.
+- **Guard hooks** (`claude/hooks/`): block heredocs, force-pushes, `git add -A`, skipped git
+  hooks, risky `rm -rf`, reading private SSH keys, and secrets in edits or commits.
+- **Settings** (`claude/settings.example.json`): matching deny rules, merged into yours.
+- **Skills** (`skills/`): `lean-audit` keeps out dead code and junk tests;
+  `instruction-audit` checks that `AGENTS.md` and friends still match the code.
+- **Project starter** (`templates/`): `AGENTS.md` as the single source of truth, with a
+  one-line `CLAUDE.md` that imports it.
+
+## Useful flags
+
+```bash
+./setup.sh --help
+```
+
+```bash
+./setup.sh --all --dry-run
+```
+
+```bash
+./setup.sh --only rules,hooks,settings
+```
+
+```bash
+./setup.sh --project ~/code/my-app
+```
 
 ## Requirements
 
-macOS or Linux, Python 3.9+, `jq`, `git`, and Claude Code for the hooks. Optional:
-`gitleaks` for secret scans.
+macOS or Linux, bash, Python 3.9+, `jq` and `git`. Claude Code for the hooks, settings and
+skills; the rules work with any agent that reads `AGENTS.md`. Optional: `gitleaks` for secret
+scans.
 
 ## License
 
