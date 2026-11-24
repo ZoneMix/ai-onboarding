@@ -14,5 +14,7 @@
   numbers, counts or dates that will go stale without anyone noticing.
 - **Short and specific.** Commands to build, test and lint; the module map; the project's
   non-obvious rules and gotchas. Skip generic advice the agent already follows.
+- **One scaffolding folder.** Project-local agent files (skills, settings, manifests) go in
+  `.claude/`. Don't create a parallel `.agents/` directory for the same thing.
 - **Skills:** the `description` is a short, specific trigger ("Use when ..."). Keep `SKILL.md`
   under 150 lines and split references by topic.

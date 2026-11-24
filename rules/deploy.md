@@ -14,4 +14,8 @@
   Never hand-edit a host and leave the repo behind.
 - **Respect rollout order and maintenance windows.** Don't enable automatic merges or applies
   before their prerequisites (tests, monitoring, rollback) are in place.
+- **Pin Docker's address pool.** Docker's default pools can hand out subnets that overlap your
+  LAN or VPN ranges, and they reshuffle on every `compose up`. Set `default-address-pools` in
+  `daemon.json` to a range nothing else uses. Symptom when you don't: a host suddenly can't
+  reach one whole subnet while everything else works.
 - **Read-only first.** Discover the live state before changing it, and record what you found.

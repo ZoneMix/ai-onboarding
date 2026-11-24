@@ -16,12 +16,17 @@ Terse, durable preferences. Prefer judgment over scaffolding: act, then report.
 - Define "done" before starting. Run the tests (or the project's build checks), fix failures
   caused by the change, and rerun without asking.
 - Parallelize genuinely independent work. Pull in context conditionally.
+- "Stick with X" means surgical edits to X only. Never reinterpret or restyle it.
+- Clean up what you start: one dev server at a time, close headless browsers, no stray
+  background processes or agents.
 
 ## Communication
 - Lead with the answer. Give a recommendation, not a menu.
 - Short, plain sentences. Back claims with a file, command output or link.
 - Commands I might run are paste-ready, one per block.
 - No em dashes or middots in anything you write.
+- Plain human voice: sentences and short paragraphs, not stacks of bold-label bullets.
+- UI copy is short and plain; pages are quiet (space over dividers, two typefaces at most).
 
 ## Code style
 - Immutable data across function boundaries: return new objects. Local accumulators are fine.
@@ -41,6 +46,8 @@ Terse, durable preferences. Prefer judgment over scaffolding: act, then report.
 ## Security
 - No secrets in source code or replies, ever. Refer to keychain items by name.
 - Validate at system boundaries. Scan for secrets before anything goes public.
+- Pin security scanners by digest and run them locally; no `curl | sh` or `:latest`.
+- Backups are encrypted to a key the writing machine does not hold.
 
 ## Deploys
 - Pin images by tag plus digest. Release through CI, never a local build.

@@ -12,6 +12,9 @@ For running more than one agent on the same machine or checkout.
   text. If an agent is waiting on a human approval, tell the human; never answer it for them.
 - **Don't rearrange someone else's workspace.** No focusing, closing, restarting or changing
   the model of another agent's session.
+- **Don't spawn background agents casually.** Each one can carry its own tool servers and
+  outlive the agent that started it. Ask before a large fan-out, and make sure every agent
+  you start has exited (and its child processes with it) before you finish.
 - **Delegate bounded work** (a parser, a test file, one script) to a smaller model; keep design
   decisions with the orchestrating agent.
 - **Long reports go to a file** the other agent can read; keep prompts short.
