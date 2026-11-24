@@ -1,0 +1,11 @@
+
+/* Make tables wider in Advanced Tables plugin */
+.markdown-preview-view .table-container {
+  width: 150%; /* or any other percentage or fixed width */
+  overflow-x: auto;
+}
+
+.markdown-preview-view table {
+  table-layout: auto;
+  width: 100%;
+}

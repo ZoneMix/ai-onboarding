@@ -11,6 +11,7 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 DRY_RUN=0
 ASSUME_YES=0
 PROJECT_DIR=""
+VAULT_DIR=""
 SELECTED=""
 
 # shellcheck source=scripts/lib/ui.sh
@@ -114,7 +115,7 @@ main_menu() {
   say "Nothing changes without a backup of what it replaces."
   while true; do
     step "What would you like to do?"
-    say "  1. Import everything (rules, hooks, settings, skills)"
+    say "  1. Import everything (rules, hooks, settings, skills, Obsidian)"
     say "  2. Pick and choose"
     say "  3. Explore what's here first"
     say "  4. Set up a project folder (AGENTS.md and CLAUDE.md)"
@@ -140,6 +141,7 @@ parse_args() {
       --only) shift; for id in $(printf '%s' "${1:-}" | tr ',' ' '); do
                 is_component "$id" || { warn "unknown item: $id"; exit 2; }
                 SELECTED="$SELECTED $id"; done ;;
+      --vault) shift; VAULT_DIR="${1:-}"; is_selected obsidian || SELECTED="$SELECTED obsidian" ;;
       --project) shift; PROJECT_DIR="${1:-}"; is_selected project || SELECTED="$SELECTED project" ;;
       --list) list_components plain; exit 0 ;;
       --explore) shift; is_component "${1:-}" || { warn "unknown item: ${1:-}"; exit 2; }; explore "$1"; exit 0 ;;

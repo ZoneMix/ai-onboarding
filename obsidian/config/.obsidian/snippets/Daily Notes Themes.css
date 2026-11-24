@@ -1,0 +1,159 @@
+/*------------------------------------------------------------------------------
+                Solarized High-Contrast Daily Note Themes
+------------------------------------------------------------------------------*/
+
+:root {
+  /* High-Contrast Solarized Text */
+  /* Base3 is the brightest Solarized tone, Base2 is the soft secondary */
+  --sol-bright: #fdf6e3; 
+  --sol-base2:  #eee8d5;
+  --sol-bg-dark: #002b36; 
+}
+
+.daily {
+  --dark: var(--sol-bg-dark);
+  background-color: var(--dark);
+  color: var(--sol-bright);
+  
+  --text-normal: var(--sol-bright);
+  --text-muted: var(--sol-base2);
+  --text-faint: var(--sol-base2);
+  
+  --checklist-done-color: var(--sol-base2);
+  --metadata-label-text-color: var(--sol-bright);
+  --metadata-input-text-color: var(--sol-bright);
+  
+  --tag-color: var(--dark);
+  --tag-background: var(--primary);
+  --hr-color: var(--primary);
+  --blockquote-border-color: var(--primary);
+  --interactive-accent: var(--primary);
+  --collapse-icon-color-collapsed: var(--primary);
+  
+  --checkbox-color: var(--primary);
+  --checkbox-marker-color: var(--dark);
+  --checkbox-color-hover: var(--sol-bright);
+  --checkbox-border-color: var(--sol-bright);
+  
+  --list-marker-color: var(--sol-bright);
+  --code-background: #00000060;
+  --code-normal: var(--primary);
+
+  --background-modifier-border: color-mix(in srgb, var(--sol-bright) 40%, transparent);
+}
+
+/* DAY PALETTES: 
+   Primary colors are saturated for contrast.
+   Dark backgrounds are deep but tinted for easy-on-the-eyes variety.
+*/
+
+.sunday, .Sunday {
+  --highlight: #ffebf5;
+  --primary: #d33682;   /* Magenta */
+  --dark: #1e0d15;      
+}
+.monday, .Monday {
+  --highlight: #ffeceb;
+  --primary: #dc322f;   /* Red */
+  --dark: #1f0b0a;
+}
+.tuesday, .Tuesday {
+  --highlight: #e6f4ff;
+  --primary: #268bd2;   /* Blue */
+  --dark: #071620;
+}
+.wednesday, .Wednesday {
+  --highlight: #fff9e6;
+  --primary: #b58900;   /* Yellow/Gold */
+  --dark: #151203;
+}
+.thursday, .Thursday {
+  --highlight: #fff2eb;
+  --primary: #cb4b16;   /* Orange */
+  --dark: #1a0f07;
+}
+.friday, .Friday {
+  --highlight: #eafffd;
+  --primary: #2aa198;   /* Cyan */
+  --dark: #031614;
+}
+.saturday, .Saturday {
+  --highlight: #f0f0ff;
+  --primary: #6c71c4;   /* Violet */
+  --dark: #0d0a1d;
+}
+
+/* LAYOUT: Original H4 Pill and Typography */
+
+.daily :is(h1, .HyperMD-header.HyperMD-header-1) {
+  color: var(--primary);
+  text-align: center;
+  font-size: 60px;
+  font-family: "JetBrains Mono", "Bai Jamjuree", sans-serif;
+  padding: 0 !important;
+}
+
+.daily :is(h2, .HyperMD-header.HyperMD-header-2) {
+  color: var(--sol-bright);
+  text-align: center;
+  font-size: 30px;
+  font-family: "JetBrains Mono", "Bai Jamjuree", sans-serif;
+  font-style: italic;
+  padding: 0 !important;
+}
+
+.daily :is(h3, .HyperMD-header.HyperMD-header-3) {
+  color: var(--primary);
+  text-align: center;
+  font-size: 32px;
+  font-family: "JetBrains Mono", sans-serif;
+  padding-top: 0;
+}
+
+/* The H4 Pill Format you liked */
+.daily :is(h4, .HyperMD-header.HyperMD-header-4) {
+  background-color: var(--primary);
+  color: var(--dark);
+  font-weight: 900;
+  margin-bottom: 0;
+  padding-top: 0;
+  font-size: 20px;
+  width: fit-content;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
+  word-wrap: normal;
+}
+
+.daily p {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.daily :is(a:link, .cm-hmd-internal-link) {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.daily :is(a:hover, .cm-hmd-internal-link:hover) {
+  color: var(--sol-bright);
+  text-decoration: underline;
+}
+
+.daily hr {
+  margin-top: 25px !important;
+  margin-bottom: 25px !important;
+  border: 0;
+  border-top: 2px solid var(--primary);
+  opacity: 0.4;
+}
+
+.daily img {
+  display: block !important;
+  margin: 15px auto !important;
+}
+
+:is(.sunday, .Sunday, .monday, .Monday, .tuesday, .Tuesday, .wednesday, .Wednesday, .thursday, .Thursday, .friday, .Friday, .saturday, .Saturday) svg {
+  color: var(--primary);
+}

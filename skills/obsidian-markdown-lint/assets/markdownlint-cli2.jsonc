@@ -1,0 +1,43 @@
+{
+  // Markdownlint config tuned for an Obsidian-style prose vault.
+  //
+  // Disabled rules are stylistic conventions that don't apply to prose-heavy
+  // study notes, knowledge bases, or vaults that ingest content from external
+  // sources (online courses, course PDFs, training labs). Everything not listed
+  // retains its markdownlint-cli2 default.
+  //
+  // To override globs/ignores per-vault, copy this file to your vault root
+  // and edit the bottom two arrays.
+  "config": {
+    "default": true,
+
+    // ─── Disabled (don't apply to prose vaults) ──────────────────────
+    "MD013": false,   // line-length: prose lines are long; Obsidian renders fine
+    "MD033": false,   // inline HTML: Obsidian uses <i>, <p class="...">, <code>
+    "MD041": false,   // first-line H1: study vaults sometimes have frontmatter
+    "MD025": false,   // single H1: merge files (user notes + raw source) have 2
+    "MD034": false,   // bare URLs: prose references are common
+    "MD036": false,   // emphasis-as-heading: course content uses bold for sub-sub
+    "MD040": false,   // code fence language: many fences are output samples
+    "MD046": false,   // code style: indent vs fenced: both fine in vaults
+    "MD024": false,   // duplicate headings: course content repeats subsection names
+                      // (e.g., "Validating the Credentials" per enum tool)
+    "MD056": false,   // table column count: URL-heavy tables miscount cells
+    "MD060": false,   // table column style: imported tables have inconsistent pipe alignment
+    "MD059": false,   // descriptive link text: prose has "click here" / "this article"
+                      // that's understandable in context but flagged as non-descriptive
+    "MD001": false,   // heading increment: course content sometimes skips H3→H4
+
+    // ─── Configured (rule on, but tuned) ─────────────────────────────
+    "MD007": { "indent": 2, "start_indented": false },
+    "MD026": { "punctuation": ".,;:!" },
+    "MD035": { "style": "---" }
+  },
+  "globs": ["content/**/*.md", "*.md"],
+  "ignores": [
+    "99 - Archive/**",
+    "working/**",
+    "node_modules/**",
+    ".obsidian/**"
+  ]
+}

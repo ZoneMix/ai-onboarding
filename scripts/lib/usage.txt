@@ -4,16 +4,17 @@ With no options, opens a menu: import everything, pick and choose, explore, or s
 project folder.
 
 Options (for agents, scripts, or people who know what they want):
-  --all              Import everything: rules, hooks, settings, skills
+  --all              Import everything: rules, hooks, settings, skills, obsidian
   --only a,b         Import only these items (see --list for the names)
-  --project DIR      Also set up AGENTS.md and CLAUDE.md in DIR
+  --project DIR      Also set up AGENTS.md, CLAUDE.md and the GitHub kit in DIR
+  --vault DIR        Also create or fill in an Obsidian vault in DIR
   --list             List the items and exit
   --explore NAME     Describe one item and list its files, then exit
   --dry-run          Show what would change, change nothing
   --yes, -y          Take the default answer to every question
   -h, --help         Show this help
 
-Items: rules, instructions, hooks, settings, skills, project
+Items: rules, instructions, hooks, settings, skills, obsidian, project
   "instructions" is a one-file version of "rules"; pick one of the two.
 
 Defaults are safe: an existing CLAUDE.md is kept and ours is saved next to it, every replaced
@@ -26,3 +27,4 @@ Examples:
   ./setup.sh --all --dry-run
   ./setup.sh --only rules,hooks,settings --yes
   ./setup.sh --project ~/code/my-app
+  ./setup.sh --only obsidian --vault ~/Documents/Vault

@@ -1,0 +1,18 @@
+{
+  "accentColor": "",
+  "cssTheme": "Atom",
+  "theme": "system",
+  "baseFontSize": 15,
+  "enabledCssSnippets": [
+    "Colored Sidebar Items",
+    "GeneralTweaks",
+    "Notebook Backgrounds",
+    "Daily Notes Themes",
+    "helton-fonts"
+  ],
+  "baseFontSizeAction": true,
+  "interfaceFontFamily": "Atkinson Hyperlegible Next",
+  "textFontFamily": "Atkinson Hyperlegible Next",
+  "monospaceFontFamily": "JetBrainsMono Nerd Font",
+  "translucency": false
+}

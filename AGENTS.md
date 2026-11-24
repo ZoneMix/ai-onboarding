@@ -17,7 +17,8 @@ instruction-file layout. This file is your entry point. Read it top to bottom, t
 | `templates/github/` | PR template, Dependabot config, pinned CI workflow and a pre-push hook. |
 | `claude/hooks/` | Claude Code PreToolUse hooks that enforce what prose cannot, with tests. |
 | `claude/settings.example.json` | Deny rules and hook wiring, merged into `settings.json`. |
-| `skills/` | Reusable skills (`SKILL.md` folders). |
+| `skills/` | Reusable skills (`SKILL.md` folders): coding and Obsidian. |
+| `obsidian/` | A vault starter for agent memory and my Obsidian app settings. |
 | `scripts/` | Helpers `setup.sh` uses: hook install, settings merge, menu code. |
 
 ## The items
@@ -31,8 +32,12 @@ instruction-file layout. This file is your entry point. Read it top to bottom, t
 - **hooks**: runs the hook tests, then installs the hooks to `~/.local/bin/claude-*`.
 - **settings**: merges deny rules and hook wiring into `~/.claude/settings.json`. Existing
   keys are kept; deny rules and hooks are unioned. Needs the hooks.
-- **skills**: copies `skills/*` to `~/.claude/skills/`: `pr-review`, `lean-audit` and
-  `instruction-audit`.
+- **skills**: copies the coding skills to `~/.claude/skills/`: `pr-review`, `lean-audit`
+  and `instruction-audit`.
+- **obsidian**: copies the vault skills (`obsidian-vault`, `obsidian-vault-restructure`,
+  `obsidian-markdown-lint`, `build-study-guide`). With `--vault <dir>` it also creates the
+  vault, or adds only the missing files to an existing one, and copies the app settings
+  without replacing any of theirs.
 - **project**: adds `AGENTS.md`, a `CLAUDE.md` shim and, if wanted, the GitHub kit to one
   project folder. It never replaces a file the project already has.
 
@@ -43,7 +48,8 @@ Every replaced file gets a timestamped `.bak-YYYYMMDD-HHMMSS` copy next to it.
 1. **Read the rules** in `rules/` and apply them for the rest of the session, including while
    you do the setup.
 2. **Ask what they want.** Show the person the list above and ask whether they want
-   everything (`--all` is rules, hooks, settings and skills) or only some items. If they'd
+   everything (`--all` is rules, hooks, settings, skills and Obsidian) or only some items.
+   Ask whether they use Obsidian and where their vault is (`--vault`). If they'd
    rather drive it themselves, tell them to run `./setup.sh` in a terminal for the menu, and
    stop here.
 3. **Preview.** Run `./setup.sh --all --dry-run` (or `--only <items> --dry-run`) and show the
@@ -67,6 +73,7 @@ The rules cover the whole loop, and are worth reading in this order:
 2. `review.md`: what to look for, how to write and verify findings, untrusted diffs.
 3. `github.md`: pull requests, CI hardening, dependency updates, releases, going public.
 4. `scheduled-agents.md`: headless review and triage jobs that run on a timer.
+5. `obsidian.md`: an Obsidian vault as long-term memory shared by every agent.
 
 The rest (`communication`, `autonomy`, `code`, `git`, `shell`, `security`, `deploy`,
 `accessibility`, `writing-and-design`, `instruction-files`, `multi-agent`) apply throughout.

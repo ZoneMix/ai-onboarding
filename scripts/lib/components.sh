@@ -1,11 +1,13 @@
 # shellcheck shell=bash
 # components.sh: what setup.sh can import, and how. Sourced, not run. Bash 3.2 compatible.
-# Globals read: REPO, CLAUDE_DIR, HOOK_DEST, PROJECT_DIR, DRY_RUN, ASSUME_YES.
+# Globals read: REPO, CLAUDE_DIR, HOOK_DEST, PROJECT_DIR, VAULT_DIR, DRY_RUN, ASSUME_YES.
 
 # shellcheck disable=SC2034  # read by setup.sh, which sources this file
-COMPONENT_IDS="rules instructions hooks settings skills project"
+COMPONENT_IDS="rules instructions hooks settings skills obsidian project"
+CODING_SKILLS="pr-review lean-audit instruction-audit"
+OBSIDIAN_SKILLS="obsidian-vault obsidian-vault-restructure obsidian-markdown-lint build-study-guide"
 # shellcheck disable=SC2034
-EVERYTHING_IDS="rules hooks settings skills"  # "instructions" is the one-file alternative to "rules"
+EVERYTHING_IDS="rules hooks settings skills obsidian"  # "instructions" is the one-file alternative to "rules"
 
 component_title() {
   case "$1" in
@@ -13,7 +15,8 @@ component_title() {
     instructions) echo "Instructions (one file)" ;;
     hooks) echo "Guard hooks" ;;
     settings) echo "Claude Code settings" ;;
-    skills) echo "Skills" ;;
+    skills) echo "Coding skills" ;;
+    obsidian) echo "Obsidian" ;;
     project) echo "Project starter" ;;
   esac
 }
@@ -25,6 +28,7 @@ component_desc() {
     hooks) echo "Block heredocs, force-push, git add -A, risky rm -rf and secrets in edits." ;;
     settings) echo "Deny rules plus hook wiring, merged into your settings.json. Needs the hooks." ;;
     skills) echo "pr-review, lean-audit (no dead code or junk tests), instruction-audit (docs stay true)." ;;
+    obsidian) echo "Vault skills, plus a vault starter and app settings if you name a vault folder." ;;
     project) echo "AGENTS.md, CLAUDE.md shim, and a GitHub kit: PR template, Dependabot, CI, pre-push." ;;
   esac
 }
@@ -35,7 +39,9 @@ component_files() {
     instructions) echo "$REPO/templates/global-CLAUDE.md" ;;
     hooks) ls "$REPO"/claude/hooks/*.py ;;
     settings) echo "$REPO/claude/settings.example.json" ;;
-    skills) ls "$REPO"/skills/*/SKILL.md ;;
+    skills) for n in $CODING_SKILLS; do echo "$REPO/skills/$n/SKILL.md"; done ;;
+    obsidian) echo "$REPO/rules/obsidian.md"; echo "$REPO/obsidian/README.md"
+              for n in $OBSIDIAN_SKILLS; do echo "$REPO/skills/$n/SKILL.md"; done ;;
     project) echo "$REPO/templates/project-AGENTS.md"; echo "$REPO/templates/project-CLAUDE.md"
              find "$REPO/templates/github" -type f | sort ;;
   esac
@@ -119,15 +125,33 @@ install_settings() {
   fi
 }
 
-install_skills() {
-  local dir name f
-  for dir in "$REPO"/skills/*/; do
-    name="$(basename "$dir")"
+# place_tree SRC_DIR DEST_DIR: place_file for every file under SRC_DIR, keeping the layout,
+# then one summary line instead of a line per file.
+place_tree() {
+  local f out="" line created=0 updated=0 same=0
+  while IFS= read -r f; do
+    line="$(place_file "$1/$f" "$2/$f")" || return 1
+    case "$line" in
+      *created*|*"would create"*) created=$((created + 1)) ;;
+      *updated*|*"would update"*) updated=$((updated + 1)); out="$out$line
+" ;;
+      *) same=$((same + 1)) ;;
+    esac
+  done < <(cd "$1" && find . -type f ! -name .DS_Store ! -name '*.pyc' ! -path '*/__pycache__/*' | sed 's|^\./||' | sort)
+  printf '%s' "$out"
+  say "  $2: $created new, $updated updated, $same unchanged"
+}
+
+install_skill_set() {  # install_skill_set "names": ask per skill, then copy it whole
+  local name
+  for name in $1; do
     ask_yn "  Install skill '$name'?" y || { say "  skipped    $name"; continue; }
-    for f in "$dir"*; do
-      place_file "$f" "$CLAUDE_DIR/skills/$name/$(basename "$f")" || return 1
-    done
+    place_tree "$REPO/skills/$name" "$CLAUDE_DIR/skills/$name" || return 1
   done
+}
+
+install_skills() {
+  install_skill_set "$CODING_SKILLS"
 }
 
 install_project() {
@@ -180,4 +204,27 @@ install_github_kit() {
       say "  To turn it on later: git -C $dir config core.hooksPath .githooks"
     fi
   fi
+}
+
+install_obsidian() {
+  local dir="$VAULT_DIR" f
+  install_skill_set "$OBSIDIAN_SKILLS" || return 1
+  if [ -z "$dir" ] && [ "$ASSUME_YES" = 0 ]; then
+    printf '  Vault folder to create or fill in (blank to skip): '
+    read -r dir || dir=""
+  fi
+  dir="${dir/#\~/$HOME}"
+  if [ -z "$dir" ]; then say "  skipped    vault starter (no vault folder given)"; return 0; fi
+  if [ -e "$dir" ] && [ ! -d "$dir" ]; then warn "$dir is not a folder; skipped."; return 0; fi
+  say "  Vault starter in $dir (existing notes are never replaced):"
+  while IFS= read -r f; do
+    place_new "$REPO/obsidian/vault-starter/$f" "$dir/$f" || return 1
+  done < <(cd "$REPO/obsidian/vault-starter" && find . -type f ! -name .DS_Store | sed 's|^\./||' | sort)
+  if ask_yn "  Copy my Obsidian settings and CSS snippets into $dir/.obsidian (yours are kept)?" y; then
+    while IFS= read -r f; do
+      place_new "$REPO/obsidian/config/.obsidian/$f" "$dir/.obsidian/$f" || return 1
+    done < <(cd "$REPO/obsidian/config/.obsidian" && find . -type f ! -name .DS_Store | sed 's|^\./||' | sort)
+    say "  Open the vault in Obsidian and allow community plugins to install the listed ones."
+  fi
+  [ -d "$dir/.git" ] || say "  To share the vault with agents safely, make it a git repo: git -C \"$dir\" init"
 }

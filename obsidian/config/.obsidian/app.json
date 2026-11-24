@@ -1,0 +1,23 @@
+{
+  "pdfExportSettings": {
+    "includeName": true,
+    "pageSize": "Letter",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 85
+  },
+  "promptDelete": false,
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "root",
+  "newLinkFormat": "absolute",
+  "attachmentFolderPath": "_obsidian/attachments",
+  "showUnsupportedFiles": true,
+  "useMarkdownLinks": true,
+  "showLineNumber": false,
+  "rightToLeft": false,
+  "vimMode": true,
+  "userIgnoreFilters": [
+    "99 - Meta/",
+    "_obsidian/"
+  ]
+}

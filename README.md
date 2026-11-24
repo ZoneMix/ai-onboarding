@@ -36,6 +36,9 @@ It will show you the options, preview the changes and install what you choose.
 - **Skills** (`skills/`): `pr-review` reviews a PR or branch with severity and
   `file:line`; `lean-audit` keeps out dead code and junk tests; `instruction-audit` checks
   that `AGENTS.md` still matches the code.
+- **Obsidian** (`obsidian/`, `rules/obsidian.md`): how I use a git-backed vault as memory
+  shared by every agent, a vault starter with that memory layout and a safe multi-agent git
+  protocol, my app settings and CSS snippets, and skills for working in a vault.
 - **Project starter** (`templates/`): `AGENTS.md` as the single source of truth, a one-line
   `CLAUDE.md` that imports it, and a GitHub kit: PR template, Dependabot, a CI workflow with
   pinned actions, and a pre-push hook.
@@ -56,6 +59,10 @@ It will show you the options, preview the changes and install what you choose.
 
 ```bash
 ./setup.sh --project ~/code/my-app
+```
+
+```bash
+./setup.sh --only obsidian --vault ~/Documents/Vault
 ```
 
 ## Requirements
