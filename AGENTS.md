@@ -14,6 +14,7 @@ instruction-file layout. This file is your entry point. Read it top to bottom, t
 | `templates/global-CLAUDE.md` | The same rules condensed into one user-level `CLAUDE.md`. |
 | `templates/project-AGENTS.md` | Starting point for a project's `AGENTS.md`. |
 | `templates/project-CLAUDE.md` | The one-line shim that makes Claude Code read `AGENTS.md`. |
+| `templates/github/` | PR template, Dependabot config, pinned CI workflow and a pre-push hook. |
 | `claude/hooks/` | Claude Code PreToolUse hooks that enforce what prose cannot, with tests. |
 | `claude/settings.example.json` | Deny rules and hook wiring, merged into `settings.json`. |
 | `skills/` | Reusable skills (`SKILL.md` folders). |
@@ -30,9 +31,10 @@ instruction-file layout. This file is your entry point. Read it top to bottom, t
 - **hooks**: runs the hook tests, then installs the hooks to `~/.local/bin/claude-*`.
 - **settings**: merges deny rules and hook wiring into `~/.claude/settings.json`. Existing
   keys are kept; deny rules and hooks are unioned. Needs the hooks.
-- **skills**: copies `skills/*` to `~/.claude/skills/`.
-- **project**: adds `AGENTS.md` and a `CLAUDE.md` shim to one project folder, never replacing
-  an existing `AGENTS.md`.
+- **skills**: copies `skills/*` to `~/.claude/skills/`: `pr-review`, `lean-audit` and
+  `instruction-audit`.
+- **project**: adds `AGENTS.md`, a `CLAUDE.md` shim and, if wanted, the GitHub kit to one
+  project folder. It never replaces a file the project already has.
 
 Every replaced file gets a timestamped `.bak-YYYYMMDD-HHMMSS` copy next to it.
 
@@ -56,6 +58,18 @@ Every replaced file gets a timestamped `.bak-YYYYMMDD-HHMMSS` copy next to it.
    then fill in `AGENTS.md` from what the code shows and leave the rest as questions.
 7. **Verify.** In a new session, confirm a heredoc is blocked and `git add -A` is refused.
    Report what was installed, where, and anything skipped.
+
+## How the work flows
+
+The rules cover the whole loop, and are worth reading in this order:
+
+1. `workflow.md`: understand, isolate (branch and worktree per task), build, verify, hand off.
+2. `review.md`: what to look for, how to write and verify findings, untrusted diffs.
+3. `github.md`: pull requests, CI hardening, dependency updates, releases, going public.
+4. `scheduled-agents.md`: headless review and triage jobs that run on a timer.
+
+The rest (`communication`, `autonomy`, `code`, `git`, `shell`, `security`, `deploy`,
+`accessibility`, `writing-and-design`, `instruction-files`, `multi-agent`) apply throughout.
 
 ## Other agents
 

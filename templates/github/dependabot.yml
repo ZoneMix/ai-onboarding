@@ -1,0 +1,23 @@
+# Dependabot: weekly grouped updates for one package ecosystem plus the pinned action SHAs.
+# Change "npm" to your ecosystem (pip, cargo, gomod, docker, ...). Majors arrive alone.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3  # wait a few days after a release before proposing it
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+    labels: ["dependencies"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns: ["*"]
+    labels: ["dependencies"]

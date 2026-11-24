@@ -1,0 +1,34 @@
+# CI: runs the same checks as your local pre-push hook. Replace the run lines with the
+# commands from your AGENTS.md. Every action is pinned to a full commit SHA (Dependabot keeps
+# the pins current); permissions are read-only unless a job needs more.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Add your toolchain setup here, pinned the same way (setup-node, setup-python, ...).
+      - name: Format
+        run: echo "replace with your format check"
+      - name: Lint
+        run: echo "replace with your linter"
+      - name: Test
+        run: echo "replace with your test command"
+      - name: Build
+        run: echo "replace with your build command"

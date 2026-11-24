@@ -27,15 +27,18 @@ It will show you the options, preview the changes and install what you choose.
 
 ## What's inside
 
-- **Rules** (`rules/`): how the agent communicates, works on its own, writes code, uses git
-  and the shell, handles secrets, deploys, writes and designs, and keeps visuals accessible.
+- **Rules** (`rules/`): how a coding task runs from plan to pull request, how to review code,
+  how to work with GitHub and CI, plus communication, git, shell, secrets, deploys, writing,
+  design and accessibility.
 - **Guard hooks** (`claude/hooks/`): block heredocs, force-pushes, `git add -A`, skipped git
   hooks, risky `rm -rf`, reading private SSH keys, and secrets in edits or commits.
 - **Settings** (`claude/settings.example.json`): matching deny rules, merged into yours.
-- **Skills** (`skills/`): `lean-audit` keeps out dead code and junk tests;
-  `instruction-audit` checks that `AGENTS.md` and friends still match the code.
-- **Project starter** (`templates/`): `AGENTS.md` as the single source of truth, with a
-  one-line `CLAUDE.md` that imports it.
+- **Skills** (`skills/`): `pr-review` reviews a PR or branch with severity and
+  `file:line`; `lean-audit` keeps out dead code and junk tests; `instruction-audit` checks
+  that `AGENTS.md` still matches the code.
+- **Project starter** (`templates/`): `AGENTS.md` as the single source of truth, a one-line
+  `CLAUDE.md` that imports it, and a GitHub kit: PR template, Dependabot, a CI workflow with
+  pinned actions, and a pre-push hook.
 
 ## Useful flags
 

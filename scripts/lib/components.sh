@@ -24,8 +24,8 @@ component_desc() {
     instructions) echo "A condensed ~/.claude/CLAUDE.md instead of the full rules. Pick this or Rules." ;;
     hooks) echo "Block heredocs, force-push, git add -A, risky rm -rf and secrets in edits." ;;
     settings) echo "Deny rules plus hook wiring, merged into your settings.json. Needs the hooks." ;;
-    skills) echo "lean-audit (no dead code or junk tests) and instruction-audit (keep AGENTS.md true)." ;;
-    project) echo "AGENTS.md template and a CLAUDE.md shim for one project folder." ;;
+    skills) echo "pr-review, lean-audit (no dead code or junk tests), instruction-audit (docs stay true)." ;;
+    project) echo "AGENTS.md, CLAUDE.md shim, and a GitHub kit: PR template, Dependabot, CI, pre-push." ;;
   esac
 }
 
@@ -36,7 +36,8 @@ component_files() {
     hooks) ls "$REPO"/claude/hooks/*.py ;;
     settings) echo "$REPO/claude/settings.example.json" ;;
     skills) ls "$REPO"/skills/*/SKILL.md ;;
-    project) echo "$REPO/templates/project-AGENTS.md"; echo "$REPO/templates/project-CLAUDE.md" ;;
+    project) echo "$REPO/templates/project-AGENTS.md"; echo "$REPO/templates/project-CLAUDE.md"
+             find "$REPO/templates/github" -type f | sort ;;
   esac
 }
 
@@ -142,7 +143,7 @@ install_project() {
     say "  kept       $dir/AGENTS.md (already there)"
   else
     place_file "$REPO/templates/project-AGENTS.md" "$dir/AGENTS.md"
-    say "  Fill in the placeholders, or ask your agent to fill them in from the code."
+    [ "$DRY_RUN" = 1 ] || say "  Fill in the placeholders, or ask your agent to fill them in from the code."
   fi
   if [ ! -f "$dir/CLAUDE.md" ]; then
     place_file "$REPO/templates/project-CLAUDE.md" "$dir/CLAUDE.md"
@@ -150,5 +151,33 @@ install_project() {
     say "  kept       $dir/CLAUDE.md; add a line '@AGENTS.md' to it so Claude reads AGENTS.md."
   else
     say "  unchanged  $dir/CLAUDE.md"
+  fi
+  if ask_yn "  Add the GitHub kit (PR template, Dependabot, CI workflow, pre-push hook)?" y; then
+    install_github_kit "$dir" || return 1
+  fi
+}
+
+# place_new SRC DEST: copy only when DEST is missing; a project's own files are never replaced.
+place_new() {
+  if [ -e "$2" ]; then say "  kept       $2 (already there)"; return 0; fi
+  place_file "$1" "$2"
+}
+
+install_github_kit() {
+  local dir="$1" kit="$REPO/templates/github"
+  place_new "$kit/pull_request_template.md" "$dir/.github/pull_request_template.md" || return 1
+  place_new "$kit/dependabot.yml" "$dir/.github/dependabot.yml" || return 1
+  place_new "$kit/workflows/ci.yml" "$dir/.github/workflows/ci.yml" || return 1
+  place_new "$kit/githooks/pre-push" "$dir/.githooks/pre-push" || return 1
+  [ "$DRY_RUN" = 1 ] && return 0
+  chmod +x "$dir/.githooks/pre-push"
+  say "  Edit the commands in .github/workflows/ci.yml and .githooks/pre-push to match AGENTS.md."
+  if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
+    if ask_yn "  Turn on the pre-push hook for this clone now?" n; then
+      git -C "$dir" config core.hooksPath .githooks
+      say "  set        core.hooksPath=.githooks in $dir"
+    else
+      say "  To turn it on later: git -C $dir config core.hooksPath .githooks"
+    fi
   fi
 }
