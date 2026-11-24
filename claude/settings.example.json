@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(~/.ssh/id_*)",
+      "Edit(~/.ssh/id_*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*.pem)",
+      "Bash(git add -A*)",
+      "Bash(git add --all*)",
+      "Bash(git add .)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git commit *--no-verify*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "$HOME/.local/bin/claude-no-heredoc", "timeout": 10 },
+          { "type": "command", "command": "$HOME/.local/bin/claude-guard-bash", "timeout": 10 },
+          { "type": "command", "command": "$HOME/.local/bin/claude-guard-secrets", "timeout": 30 }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          { "type": "command", "command": "$HOME/.local/bin/claude-guard-secrets", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}
