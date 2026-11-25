@@ -23,35 +23,33 @@ component_title() {
 
 component_desc() {
   case "$1" in
-    rules) echo "Topic rule files in ~/.claude/rules/ai-onboarding/, loaded in every project." ;;
+    rules) echo "Topic and per-language rules in ~/.claude/rules/ai-onboarding/, loaded everywhere." ;;
     instructions) echo "A condensed ~/.claude/CLAUDE.md instead of the full rules. Pick this or Rules." ;;
     hooks) echo "Block heredocs, force-push, git add -A, risky rm -rf and secrets in edits." ;;
     settings) echo "Deny rules plus hook wiring, merged into your settings.json. Needs the hooks." ;;
     skills) echo "pr-review, lean-audit (no dead code or junk tests), instruction-audit (docs stay true)." ;;
-    obsidian) echo "Vault skills, plus a vault starter and app settings if you name a vault folder." ;;
+    obsidian) echo "Vault skills and /vault-map, /backlinks; a vault starter and settings with --vault." ;;
     project) echo "AGENTS.md, CLAUDE.md shim, and a GitHub kit: PR template, Dependabot, CI, pre-push." ;;
   esac
 }
 
 component_files() {
   case "$1" in
-    rules) ls "$REPO"/rules/*.md ;;
+    rules) ls "$REPO"/rules/*.md "$REPO"/rules/languages/*.md ;;
     instructions) echo "$REPO/templates/global-CLAUDE.md" ;;
     hooks) ls "$REPO"/claude/hooks/*.py ;;
     settings) echo "$REPO/claude/settings.example.json" ;;
     skills) for n in $CODING_SKILLS; do echo "$REPO/skills/$n/SKILL.md"; done ;;
     obsidian) echo "$REPO/rules/obsidian.md"; echo "$REPO/obsidian/README.md"
-              for n in $OBSIDIAN_SKILLS; do echo "$REPO/skills/$n/SKILL.md"; done ;;
+              for n in $OBSIDIAN_SKILLS; do echo "$REPO/skills/$n/SKILL.md"; done
+              ls "$REPO"/commands/*.md ;;
     project) echo "$REPO/templates/project-AGENTS.md"; echo "$REPO/templates/project-CLAUDE.md"
              find "$REPO/templates/github" -type f | sort ;;
   esac
 }
 
 install_rules() {
-  local f
-  for f in "$REPO"/rules/*.md; do
-    place_file "$f" "$CLAUDE_DIR/rules/ai-onboarding/$(basename "$f")" || return 1
-  done
+  place_tree "$REPO/rules" "$CLAUDE_DIR/rules/ai-onboarding"
 }
 
 install_instructions() {
@@ -209,6 +207,7 @@ install_github_kit() {
 install_obsidian() {
   local dir="$VAULT_DIR" f
   install_skill_set "$OBSIDIAN_SKILLS" || return 1
+  place_tree "$REPO/commands" "$CLAUDE_DIR/commands" || return 1
   if [ -z "$dir" ] && [ "$ASSUME_YES" = 0 ]; then
     printf '  Vault folder to create or fill in (blank to skip): '
     read -r dir || dir=""

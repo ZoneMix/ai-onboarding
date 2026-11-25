@@ -10,7 +10,8 @@ instruction-file layout. This file is your entry point. Read it top to bottom, t
 | Path | What it is |
 |---|---|
 | `setup.sh` | The installer. A menu for people; flags for agents (`./setup.sh --help`). |
-| `rules/` | The working rules, one short file per topic. The source of truth for behavior. |
+| `rules/` | The working rules, one short file per topic, plus `rules/languages/` (Python, Rust, TypeScript, shell). The source of truth for behavior. |
+| `commands/` | Slash commands: `/vault-map` and `/backlinks` for Obsidian. |
 | `templates/global-CLAUDE.md` | The same rules condensed into one user-level `CLAUDE.md`. |
 | `templates/project-AGENTS.md` | Starting point for a project's `AGENTS.md`. |
 | `templates/project-CLAUDE.md` | The one-line shim that makes Claude Code read `AGENTS.md`. |
@@ -25,7 +26,8 @@ instruction-file layout. This file is your entry point. Read it top to bottom, t
 
 `./setup.sh --list` prints them. Each can be installed on its own:
 
-- **rules**: copies `rules/*.md` to `~/.claude/rules/ai-onboarding/`. Claude Code loads
+- **rules**: copies `rules/` (including `languages/`) to `~/.claude/rules/ai-onboarding/`.
+  The language files carry `paths:` frontmatter so they apply to matching files. Claude Code loads
   `~/.claude/rules/` in every project.
 - **instructions**: the one-file alternative to rules, installed as `~/.claude/CLAUDE.md`. An
   existing file is kept and ours is saved next to it as `CLAUDE.ai-onboarding.md`.
@@ -35,7 +37,8 @@ instruction-file layout. This file is your entry point. Read it top to bottom, t
 - **skills**: copies the coding skills to `~/.claude/skills/`: `pr-review`, `lean-audit`
   and `instruction-audit`.
 - **obsidian**: copies the vault skills (`obsidian-vault`, `obsidian-vault-restructure`,
-  `obsidian-markdown-lint`, `build-study-guide`). With `--vault <dir>` it also creates the
+  `obsidian-markdown-lint`, `build-study-guide`) and the `/vault-map` and `/backlinks`
+  commands. With `--vault <dir>` it also creates the
   vault, or adds only the missing files to an existing one, and copies the app settings
   without replacing any of theirs.
 - **project**: adds `AGENTS.md`, a `CLAUDE.md` shim and, if wanted, the GitHub kit to one

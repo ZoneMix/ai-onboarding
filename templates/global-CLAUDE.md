@@ -73,6 +73,12 @@ Terse, durable preferences. Prefer judgment over scaffolding: act, then report.
 - Never distinguish states by color alone: add labels, shapes or patterns. Prefer blue and
   orange over red and green. Keep light and dark mode working.
 
+## Languages
+- Python: ruff with a pinned rule set, `Decimal` for money, pytest, stdlib first.
+- Rust: fmt, clippy `-D warnings`, tests; no `unwrap` on outside input; `pub(crate)`.
+- TypeScript: strict, ESM, Zod at the boundary, `eslint --max-warnings 0`, `tsc --noEmit`.
+- Shell: shellcheck clean, bash 3.2 portable, `set -euo pipefail`, quote expansions.
+
 ## Writing skills
 - SKILL.md description = a short, specific trigger ("Use when ..."), not a broad "use when
   working with X."

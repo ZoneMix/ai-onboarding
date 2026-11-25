@@ -29,7 +29,7 @@ It will show you the options, preview the changes and install what you choose.
 
 - **Rules** (`rules/`): how a coding task runs from plan to pull request, how to review code,
   how to work with GitHub and CI, plus communication, git, shell, secrets, deploys, writing,
-  design and accessibility.
+  design and accessibility. `rules/languages/` adds Python, Rust, TypeScript and shell.
 - **Guard hooks** (`claude/hooks/`): block heredocs, force-pushes, `git add -A`, skipped git
   hooks, risky `rm -rf`, reading private SSH keys, and secrets in edits or commits.
 - **Settings** (`claude/settings.example.json`): matching deny rules, merged into yours.
