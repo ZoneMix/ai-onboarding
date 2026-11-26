@@ -8,13 +8,16 @@ Complete reference for the Obsidian command-line interface. Requires Obsidian 1.
 
 - **Parameters** take values: `parameter=value` or `parameter="value with spaces"`
 - **Flags** are boolean switches: `open`, `overwrite`
-- **Multiline content**: use `\n` for newlines, `\t` for tabs
+- **Multiline content**: in `content=`, `\n` becomes a newline and `\t` a tab, with no escape, so a backslash in the text (LaTeX `\theta`, a path like `C:\notes`) is corrupted. Write such content, or anything over about 4 KB, to the note file directly.
+- **The CLI exits 0 even when a command fails**: read its output before reporting success.
+- **Opening is opt-in**: pass `open` to open a note; there is no `silent` flag.
+- **Basic syntax lives in the official `obsidian-cli` skill** (obsidianmd/obsidian-skills); this skill adds the vault workflows.
 
 ### File Targeting
 
 - `file=<name>`: resolves by filename (wikilink-style, no extension needed)
 - `path=<path>`: exact path from vault root (e.g., `path="8_DAILY/2026-03-17.md"`)
-- `vault=<name>` or `vault=<id>`: target a specific vault
+- `vault=<name>` or `vault=<id>`: target a specific vault. Must be the first parameter (`obsidian vault="X" search ...`); elsewhere it is ignored. Output flags (`--copy`, `--json`) go last.
 
 ### Output
 
@@ -45,7 +48,7 @@ Complete reference for the Obsidian command-line interface. Requires Obsidian 1.
 | `read` | Read note content to stdout | `file=<name>` or `path=<path>` |
 | `append` | Append content to a note | `file=<name>`, `content=<text>` |
 | `prepend` | Prepend content to a note | `file=<name>`, `content=<text>` |
-| `move` | Move a note to a folder | `file=<name>`, `folder=<name>` |
+| `move` | Move a note to a folder (updates links) | `file=<name>` or `path=<path>`, `to=<folder/>` |
 | `rename` | Rename a note | `file=<name>`, `name=<new-name>` |
 | `delete` | Delete a note | `file=<name>` or `path=<path>` |
 

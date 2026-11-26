@@ -47,11 +47,11 @@ All commands below use `obsidian` as the CLI name. Adjust to match your alias.
 
 ### Vault Targeting
 
-Target a specific vault with `vault=<name>` or `vault=<id>`:
+Target a specific vault with `vault=<name>` or `vault=<id>`. It only works as the **first** parameter, right after `obsidian`; anywhere else it is ignored:
 
 ```bash
-obsidian daily vault="My Vault"
-obsidian search query="meeting" vault="Work"
+obsidian vault="My Vault" daily
+obsidian vault="Work" search query="meeting"
 ```
 
 If only one vault is open, the `vault=` parameter is optional.
@@ -120,7 +120,10 @@ obsidian <command> [parameters] [flags]
 
 - **Parameters** take values: `file="Note Name"`, `query="search term"`
 - **Flags** are boolean switches: `open`, `overwrite`
-- **Multiline content**: use `\n` for newlines, `\t` for tabs
+- **Multiline content**: in `content=`, `\n` becomes a newline and `\t` a tab, with no escape, so a backslash in the text (LaTeX `\theta`, a path like `C:\notes`) is corrupted. Write such content, or anything over about 4 KB, to the note file directly.
+- **The CLI exits 0 even when a command fails**: read its output before reporting success.
+- **Opening is opt-in**: pass `open` to open a note; there is no `silent` flag.
+- **Basic syntax lives in the official `obsidian-cli` skill** (obsidianmd/obsidian-skills); this skill adds the vault workflows.
 - **Targeting**: `file=<name>` (wikilink-style) or `path=<exact/path.md>` (from vault root)
 - **Clipboard**: add `--copy` flag to copy output to clipboard
 
@@ -151,7 +154,7 @@ obsidian <command> [parameters] [flags]
 obsidian create name="Note" content="Body" template="Template Name"
 obsidian append file="Note" content="New content"
 obsidian prepend file="Note" content="Top content"
-obsidian move file="Note" folder="Archive"
+obsidian move file="Note" to="Archive/"   # use move/rename, never mv, so links update
 obsidian rename file="Old Name" name="New Name"
 obsidian delete file="Note"
 ```
@@ -265,7 +268,7 @@ Many workflows reference confidence markers in notes. The convention:
 obsidian daily:append content="## Analysis\n\nFindings here..."
 
 # Create a new standalone note
-obsidian create name="Graduated Idea" content="..." folder="Essays"
+obsidian create path="Essays/Graduated Idea.md" content="..."
 
 # Update properties
 obsidian property:set file="Note" property="status" value="reviewed"

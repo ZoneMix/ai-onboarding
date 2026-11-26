@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # components.sh: what setup.sh can import, and how. Sourced, not run. Bash 3.2 compatible.
-# Globals read: REPO, CLAUDE_DIR, HOOK_DEST, PROJECT_DIR, VAULT_DIR, DRY_RUN, ASSUME_YES.
+# Globals read: REPO, CLAUDE_DIR, HOOK_DEST, PROJECT_DIR, VAULT_DIR, WORK_VAULT_DIR, DRY_RUN, ASSUME_YES.
 
 # shellcheck disable=SC2034  # read by setup.sh, which sources this file
 COMPONENT_IDS="rules instructions hooks settings skills obsidian project"
@@ -28,7 +28,7 @@ component_desc() {
     hooks) echo "Block heredocs, force-push, git add -A, risky rm -rf and secrets in edits." ;;
     settings) echo "Deny rules plus hook wiring, merged into your settings.json. Needs the hooks." ;;
     skills) echo "pr-review, lean-audit (no dead code or junk tests), instruction-audit (docs stay true)." ;;
-    obsidian) echo "Vault skills and /vault-map, /backlinks; a vault starter and settings with --vault." ;;
+    obsidian) echo "Vault skills, /vault-map, /backlinks and the push backstop; life and work vault starters with --vault and --work-vault." ;;
     project) echo "AGENTS.md, CLAUDE.md shim, and a GitHub kit: PR template, Dependabot, CI, pre-push." ;;
   esac
 }
@@ -204,26 +204,55 @@ install_github_kit() {
   fi
 }
 
+fill_vault() {  # fill_vault <starter dir> <vault dir> <label>: add the starter's missing files, never replace a note
+  local starter="$1" dir="$2" label="$3" f
+  if [ -e "$dir" ] && [ ! -d "$dir" ]; then warn "$dir is not a folder; skipped."; return 0; fi
+  say "  $label in $dir (existing notes are never replaced):"
+  while IFS= read -r f; do
+    place_new "$starter/$f" "$dir/$f" || return 1
+  done < <(cd "$starter" && find . -type f ! -name .DS_Store | sed 's|^\./||' | sort)
+  [ "$DRY_RUN" = 1 ] && return 0
+  [ -f "$dir/.githooks/pre-commit" ] && chmod +x "$dir/.githooks/pre-commit"
+  if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
+    if ask_yn "  Turn on the vault pre-commit hook (gitleaks, size cap) for $dir now?" y; then
+      git -C "$dir" config core.hooksPath .githooks
+      say "  set        core.hooksPath=.githooks in $dir"
+    fi
+  else
+    say "  To share the vault with agents safely, make it a git repo: git -C \"$dir\" init"
+    say "  then turn on its hook: git -C \"$dir\" config core.hooksPath .githooks"
+  fi
+}
+
 install_obsidian() {
-  local dir="$VAULT_DIR" f
+  local dir="$VAULT_DIR" work="$WORK_VAULT_DIR" f
   install_skill_set "$OBSIDIAN_SKILLS" || return 1
   place_tree "$REPO/commands" "$CLAUDE_DIR/commands" || return 1
-  if [ -z "$dir" ] && [ "$ASSUME_YES" = 0 ]; then
-    printf '  Vault folder to create or fill in (blank to skip): '
+  place_new "$REPO/obsidian/scripts/vault-daily-push" "$HOOK_DEST/vault-daily-push" || return 1
+  [ "$DRY_RUN" = 1 ] || chmod +x "$HOOK_DEST/vault-daily-push"
+  say "  Schedule the push backstop with obsidian/scripts/launchd or systemd (see obsidian/scripts/README.md)."
+  say "  Agents also want the official skills: claude plugin marketplace add obsidianmd/obsidian-skills"
+  say "  then: claude plugin install obsidian@obsidian-skills"
+  if [ -z "$dir" ] && [ -z "$work" ] && [ "$ASSUME_YES" = 0 ]; then
+    printf '  Life vault folder to create or fill in (blank to skip): '
     read -r dir || dir=""
+    printf '  Work vault folder to create or fill in (blank to skip): '
+    read -r work || work=""
   fi
   dir="${dir/#\~/$HOME}"
-  if [ -z "$dir" ]; then say "  skipped    vault starter (no vault folder given)"; return 0; fi
-  if [ -e "$dir" ] && [ ! -d "$dir" ]; then warn "$dir is not a folder; skipped."; return 0; fi
-  say "  Vault starter in $dir (existing notes are never replaced):"
-  while IFS= read -r f; do
-    place_new "$REPO/obsidian/vault-starter/$f" "$dir/$f" || return 1
-  done < <(cd "$REPO/obsidian/vault-starter" && find . -type f ! -name .DS_Store | sed 's|^\./||' | sort)
-  if ask_yn "  Copy my Obsidian settings and CSS snippets into $dir/.obsidian (yours are kept)?" y; then
-    while IFS= read -r f; do
-      place_new "$REPO/obsidian/config/.obsidian/$f" "$dir/.obsidian/$f" || return 1
-    done < <(cd "$REPO/obsidian/config/.obsidian" && find . -type f ! -name .DS_Store | sed 's|^\./||' | sort)
-    say "  Open the vault in Obsidian and allow community plugins to install the listed ones."
-  fi
-  [ -d "$dir/.git" ] || say "  To share the vault with agents safely, make it a git repo: git -C \"$dir\" init"
+  work="${work/#\~/$HOME}"
+  if [ -z "$dir" ] && [ -z "$work" ]; then say "  skipped    vault starters (no vault folder given)"; return 0; fi
+  if [ -n "$dir" ]; then fill_vault "$REPO/obsidian/vault-starter" "$dir" "Life vault starter" || return 1; fi
+  if [ -n "$work" ]; then fill_vault "$REPO/obsidian/work-vault-starter" "$work" "Work vault starter" || return 1; fi
+  local target targets=()
+  [ -n "$dir" ] && targets+=("$dir")
+  [ -n "$work" ] && targets+=("$work")
+  for target in "${targets[@]}"; do
+    if ask_yn "  Copy my Obsidian settings and CSS snippets into $target/.obsidian (yours are kept)?" y; then
+      while IFS= read -r f; do
+        place_new "$REPO/obsidian/config/.obsidian/$f" "$target/.obsidian/$f" || return 1
+      done < <(cd "$REPO/obsidian/config/.obsidian" && find . -type f ! -name .DS_Store | sed 's|^\./||' | sort)
+      say "  Open the vault in Obsidian and allow community plugins to install the listed ones."
+    fi
+  done
 }

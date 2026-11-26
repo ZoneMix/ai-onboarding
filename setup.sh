@@ -12,6 +12,7 @@ DRY_RUN=0
 ASSUME_YES=0
 PROJECT_DIR=""
 VAULT_DIR=""
+WORK_VAULT_DIR=""
 SELECTED=""
 
 # shellcheck source=scripts/lib/ui.sh
@@ -142,6 +143,7 @@ parse_args() {
                 is_component "$id" || { warn "unknown item: $id"; exit 2; }
                 SELECTED="$SELECTED $id"; done ;;
       --vault) shift; VAULT_DIR="${1:-}"; is_selected obsidian || SELECTED="$SELECTED obsidian" ;;
+      --work-vault) shift; WORK_VAULT_DIR="${1:-}"; is_selected obsidian || SELECTED="$SELECTED obsidian" ;;
       --project) shift; PROJECT_DIR="${1:-}"; is_selected project || SELECTED="$SELECTED project" ;;
       --list) list_components plain; exit 0 ;;
       --explore) shift; is_component "${1:-}" || { warn "unknown item: ${1:-}"; exit 2; }; explore "$1"; exit 0 ;;

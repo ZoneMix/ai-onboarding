@@ -19,7 +19,7 @@ instruction-file layout. This file is your entry point. Read it top to bottom, t
 | `claude/hooks/` | Claude Code PreToolUse hooks that enforce what prose cannot, with tests. |
 | `claude/settings.example.json` | Deny rules and hook wiring, merged into `settings.json`. |
 | `skills/` | Reusable skills (`SKILL.md` folders): coding and Obsidian. |
-| `obsidian/` | A vault starter for agent memory and my Obsidian app settings. |
+| `obsidian/` | Life and work vault starters, the push backstop script, and my Obsidian app settings. Start with `obsidian/README.md`. |
 | `scripts/` | Helpers `setup.sh` uses: hook install, settings merge, menu code. |
 
 ## The items
@@ -38,7 +38,7 @@ instruction-file layout. This file is your entry point. Read it top to bottom, t
   and `instruction-audit`.
 - **obsidian**: copies the vault skills (`obsidian-vault`, `obsidian-vault-restructure`,
   `obsidian-markdown-lint`, `build-study-guide`) and the `/vault-map` and `/backlinks`
-  commands. With `--vault <dir>` it also creates the
+  commands, and the `vault-daily-push` backstop. With `--vault <dir>` (life vault) or `--work-vault <dir>` (work vault) it also creates the
   vault, or adds only the missing files to an existing one, and copies the app settings
   without replacing any of theirs.
 - **project**: adds `AGENTS.md`, a `CLAUDE.md` shim and, if wanted, the GitHub kit to one
@@ -52,7 +52,7 @@ Every replaced file gets a timestamped `.bak-YYYYMMDD-HHMMSS` copy next to it.
    you do the setup.
 2. **Ask what they want.** Show the person the list above and ask whether they want
    everything (`--all` is rules, hooks, settings, skills and Obsidian) or only some items.
-   Ask whether they use Obsidian and where their vault is (`--vault`). If they'd
+   Ask whether they use Obsidian and where their vaults are (`--vault`, `--work-vault`), and point them at the official obsidian-skills (`obsidian/README.md`). If they'd
    rather drive it themselves, tell them to run `./setup.sh` in a terminal for the menu, and
    stop here.
 3. **Preview.** Run `./setup.sh --all --dry-run` (or `--only <items> --dry-run`) and show the

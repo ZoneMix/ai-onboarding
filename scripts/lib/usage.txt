@@ -7,7 +7,8 @@ Options (for agents, scripts, or people who know what they want):
   --all              Import everything: rules, hooks, settings, skills, obsidian
   --only a,b         Import only these items (see --list for the names)
   --project DIR      Also set up AGENTS.md, CLAUDE.md and the GitHub kit in DIR
-  --vault DIR        Also create or fill in an Obsidian vault in DIR
+  --vault DIR        Also create or fill in the life vault (Obsidian) in DIR
+  --work-vault DIR   Also create or fill in the work vault (type-based) in DIR
   --list             List the items and exit
   --explore NAME     Describe one item and list its files, then exit
   --dry-run          Show what would change, change nothing
@@ -28,3 +29,4 @@ Examples:
   ./setup.sh --only rules,hooks,settings --yes
   ./setup.sh --project ~/code/my-app
   ./setup.sh --only obsidian --vault ~/Documents/Vault
+  ./setup.sh --only obsidian --vault ~/Documents/Life --work-vault ~/Documents/Work
