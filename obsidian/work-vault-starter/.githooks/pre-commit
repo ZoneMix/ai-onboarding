@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Vault pre-commit hook. Runs for every committer: agents, the Obsidian Git plugin and people.
+# Blocks a commit that adds a secret, a file over the size cap, or scratch files outside _agents/.
+# Enabled per clone with: git config core.hooksPath .githooks
+set -euo pipefail
+
+readonly MAX_MB=10
+readonly MAX_BYTES=$((MAX_MB * 1024 * 1024))
+readonly AGENTS_DIR="_agents/"
+# Scratch and editor leftovers never belong in human folders.
+readonly SCRATCH_RE='(\.tmp$|\.swp$|~$|(^|/)scratch/|(^|/)working/)'
+# The Obsidian GUI starts hooks with a thin PATH, so check the usual install spots too.
+readonly GITLEAKS_FALLBACKS=(/opt/homebrew/bin/gitleaks /usr/local/bin/gitleaks)
+
+fail() {
+  echo "pre-commit: $1" >&2
+  exit 1
+}
+
+find_gitleaks() {
+  if command -v gitleaks >/dev/null 2>&1; then
+    command -v gitleaks
+    return 0
+  fi
+  local candidate
+  for candidate in "${GITLEAKS_FALLBACKS[@]}"; do
+    if [ -x "$candidate" ]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+check_sizes_and_scratch() {
+  local path size divide=0
+  # The scratch rule applies only to a vault that has the agents/human divide.
+  [ -d "$(git rev-parse --show-toplevel)/${AGENTS_DIR}" ] && divide=1
+  while IFS= read -r -d '' path; do
+    size=$(git cat-file -s ":$path")
+    if [ "$size" -gt "$MAX_BYTES" ]; then
+      fail "$path is over ${MAX_MB} MB. Keep large binaries out of the vault."
+    fi
+    if [ "$divide" -eq 1 ] && [[ "$path" != "$AGENTS_DIR"* && "$path" =~ $SCRATCH_RE ]]; then
+      fail "$path looks like scratch or working output. Agent working files go under ${AGENTS_DIR}."
+    fi
+  done < <(git diff --cached --name-only --diff-filter=AM -z)
+}
+
+scan_secrets() {
+  local gitleaks_bin
+  gitleaks_bin=$(find_gitleaks) || fail "gitleaks is not installed, so the secret scan cannot run. Install it (brew install gitleaks)."
+  if ! "$gitleaks_bin" git --pre-commit --staged --redact --no-banner --log-level error .; then
+    fail "gitleaks found a possible secret in the staged changes. Remove it; never commit secret values."
+  fi
+}
+
+check_sizes_and_scratch
+scan_secrets

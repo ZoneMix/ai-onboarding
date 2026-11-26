@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+# vault-daily-push: once-a-day backstop that pushes any committed but unpushed vault work.
+# It never stages or commits anything: every writer commits its own files. It only syncs what is
+# already committed, under the same .git/memory.lock the agents use.
+#
+# Config: one absolute vault path per line in $VAULT_PUSH_CONFIG (default below); # starts a comment.
+# Settings (environment): VAULT_PUSH_LOG (log file), VAULT_PUSH_TZ (time zone for the log and the
+# skip day, default the system zone), VAULT_PUSH_SKIP_DAY (1-7, Monday=1, a weekday with no run;
+# default none), VAULT_PUSH_OUTBOX (a folder that gets one note per day when something needs a
+# person; default none), VAULT_PUSH_STALE_MIN (minutes before an uncommitted file counts, default 60).
+# Usage: vault-daily-push [--force]   (--force ignores the skip day, for testing)
+set -uo pipefail
+
+readonly CONFIG="${VAULT_PUSH_CONFIG:-$HOME/.config/vault-daily-push/vaults}"
+readonly LOG="${VAULT_PUSH_LOG:-$HOME/.local/state/vault-daily-push/vault-daily-push.log}"
+readonly TZ_NAME="${VAULT_PUSH_TZ:-}"
+readonly REMOTE="origin"
+readonly BRANCH="main"
+readonly LOCK_TRIES=10
+readonly LOCK_WAIT_SECONDS=30
+readonly STALE_LOCK_MINUTES=10
+readonly SKIP_DAY="${VAULT_PUSH_SKIP_DAY:-}"
+readonly STALE_EDIT_MINUTES="${VAULT_PUSH_STALE_MIN:-60}"
+# Problems (not routine results) also go to an outbox folder, when one is set.
+readonly OUTBOX="${VAULT_PUSH_OUTBOX:-}"
+PROBLEMS=()
+
+now() {
+  if [ -n "$TZ_NAME" ]; then TZ="$TZ_NAME" date "$@"; else date "$@"; fi
+}
+
+log() {
+  printf '%s %s\n' "$(now '+%Y-%m-%d %H:%M:%S')" "$*" >>"$LOG"
+}
+
+problem() {
+  log "$*"
+  PROBLEMS+=("$*")
+}
+
+report_problems() {
+  [ "${#PROBLEMS[@]}" -eq 0 ] && return 0
+  local day note line
+  printf 'vault-daily-push: %s\n' "${PROBLEMS[@]}" >&2
+  [ -n "$OUTBOX" ] || return 0
+  day="$(now '+%Y-%m-%d')"
+  mkdir -p "$OUTBOX"
+  note="$OUTBOX/vault-daily-push-$day.md"
+  {
+    echo "Vault daily push needs a look ($day)."
+    for line in "${PROBLEMS[@]}"; do echo "- $line"; done
+    echo "Log: $LOG"
+  } >"$note"
+  log "problems reported to $note"
+}
+
+is_skip_day() {
+  [ -n "$SKIP_DAY" ] && [ "$(now +%u)" = "$SKIP_DAY" ]
+}
+
+take_lock() {
+  local lock="$1/.git/memory.lock" try
+  for ((try = 1; try <= LOCK_TRIES; try++)); do
+    if mkdir "$lock" 2>/dev/null; then
+      return 0
+    fi
+    if [ -n "$(find "$lock" -maxdepth 0 -mmin +"$STALE_LOCK_MINUTES" 2>/dev/null)" ]; then
+      log "$1: removing stale lock (older than ${STALE_LOCK_MINUTES} min)"
+      rmdir "$lock" 2>/dev/null || log "$1: could not remove stale lock"
+      continue
+    fi
+    sleep "$LOCK_WAIT_SECONDS"
+  done
+  return 1
+}
+
+report_uncommitted() {
+  # Only files left uncommitted for over STALE_EDIT_MINUTES count: fresh edits are still in flight.
+  local vault="$1" path stale=()
+  while IFS= read -r path; do
+    [ -n "$path" ] || continue
+    if [ -n "$(find "$vault/$path" -maxdepth 0 -mmin +"$STALE_EDIT_MINUTES" 2>/dev/null)" ]; then
+      stale+=("$path")
+    fi
+  done < <(git -C "$vault" status --porcelain --untracked-files=all | cut -c4- | sed 's/^"//; s/"$//; s/.* -> //')
+  if [ "${#stale[@]}" -gt 0 ]; then
+    problem "$vault: ${#stale[@]} path(s) uncommitted for over ${STALE_EDIT_MINUTES} min, left alone; a writer did not commit (a blocked pre-commit hook looks like this): ${stale[*]:0:3}"
+  fi
+}
+
+sync_vault() {
+  local vault="$1" ahead
+  if ! git -C "$vault" fetch -q "$REMOTE" "$BRANCH"; then
+    problem "$vault: fetch failed"
+    return 1
+  fi
+  ahead=$(git -C "$vault" rev-list --count "$REMOTE/$BRANCH..$BRANCH")
+  if [ "$ahead" -eq 0 ]; then
+    log "$vault: nothing to push"
+    return 0
+  fi
+  if ! git -C "$vault" pull -q --rebase --autostash "$REMOTE" "$BRANCH"; then
+    git -C "$vault" rebase --abort 2>/dev/null || true
+    problem "$vault: rebase conflict, aborted; needs a person"
+    return 1
+  fi
+  if ! git -C "$vault" push -q "$REMOTE" "$BRANCH"; then
+    problem "$vault: push failed"
+    return 1
+  fi
+  log "$vault: pushed $ahead commit(s)"
+}
+
+process_vault() {
+  local vault="$1" rc=0
+  if [ ! -d "$vault/.git" ]; then
+    problem "$vault: not a git repo, skipped"
+    return 1
+  fi
+  if ! take_lock "$vault"; then
+    problem "$vault: lock busy after $LOCK_TRIES tries, skipped"
+    return 1
+  fi
+  sync_vault "$vault" || rc=1
+  report_uncommitted "$vault"
+  rmdir "$vault/.git/memory.lock" 2>/dev/null || log "$vault: lock already gone at release"
+  return "$rc"
+}
+
+main() {
+  mkdir -p "$(dirname "$LOG")"
+  if [ "${1:-}" != "--force" ] && is_skip_day; then
+    log "skip day: no run"
+    return 0
+  fi
+  if [ ! -r "$CONFIG" ]; then
+    problem "config $CONFIG missing"; report_problems
+    return 1
+  fi
+  local line status=0
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%%#*}"
+    line="$(printf '%s' "$line" | sed 's/[[:space:]]*$//')"
+    [ -z "$line" ] && continue
+    process_vault "$line" || status=1
+  done <"$CONFIG"
+  report_problems
+  return "$status"
+}
+
+main "$@"

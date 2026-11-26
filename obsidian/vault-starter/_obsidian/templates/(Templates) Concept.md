@@ -1,16 +1,16 @@
 ---
-title: (Templates) Concept
-date_created: 2026-05-01
-description: 
-type: concept
-domain: 
-reference: 
+title: <% tp.file.title %>
+date_created: <% tp.date.now("YYYY-MM-DD") %>
+description: <% tp.system.prompt("One sentence: what is this idea?") %>
+type: note
+domain: <% tp.system.suggester(["study", "reading", "home", "projects", "personal", "operations"], ["study", "reading", "home", "projects", "personal", "operations"], false, "Domain") %>
 ---
-
-# (Templates) Concept
+# <% tp.file.title %>
 
 ## Definition
 
-## Key Principles
+<% tp.file.cursor() %>
 
-## Related Concepts
+## Key principles
+
+## Related

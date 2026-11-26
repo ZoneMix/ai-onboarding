@@ -1,4 +1,36 @@
+# Obsidian volatile state
 .obsidian/workspace*.json
+.obsidian/workspace
 .obsidian/cache
+.obsidian/plugins/*/node_modules/
 .trash/
 .DS_Store
+Thumbs.db
+*.tmp
+# Build and dependency output (agent build trees in _agents/projects/ keep theirs out of git)
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+dist/
+build/
+.wrangler/
+# Secrets never go in a vault
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.kdbx
+id_rsa*
+id_ed25519*
+# Audio and video stay out of git history (keep them outside the vault)
+*.m4a
+*.mp3
+*.wav
+*.mp4
+*.mov

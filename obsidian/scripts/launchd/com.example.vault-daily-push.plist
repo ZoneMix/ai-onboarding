@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  macOS: run vault-daily-push every evening at 21:00 local time.
+  Replace YOUR_USER, copy to ~/Library/LaunchAgents/, then:
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.example.vault-daily-push.plist
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.example.vault-daily-push</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/YOUR_USER/.local/bin/vault-daily-push</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/Users/YOUR_USER/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>21</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+	<key>RunAtLoad</key>
+	<false/>
+	<key>StandardOutPath</key>
+	<string>/Users/YOUR_USER/Library/Logs/vault-daily-push.launchd.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/YOUR_USER/Library/Logs/vault-daily-push.launchd.log</string>
+</dict>
+</plist>

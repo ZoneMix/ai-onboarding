@@ -1,0 +1,29 @@
+{
+  // markdownlint-cli2 for the vault's human folders. Agents lint the notes they touch
+  // before committing: npx markdownlint-cli2 "<file>" (run from the vault root). Whole vault: npx markdownlint-cli2 "**/*.md".
+  // _agents/ is the agents workspace and is never linted. Based on the obsidian-markdown-lint skill.
+  "config": {
+    "default": true,
+    "MD013": false,   // line length: prose lines are long and Obsidian wraps them
+    "MD033": false,   // inline HTML: Obsidian notes use it
+    "MD034": false,   // bare URLs: common in references
+    "MD036": false,   // emphasis as heading: older notes use bold sub-labels
+    "MD040": false,   // fence language: many fences are plain text
+    "MD041": false,   // first line H1: notes open with frontmatter
+    "MD046": false,   // code block style: indented and fenced are both fine
+    "MD056": false,   // table column count: wikilinks with | aliases miscount
+    "MD059": false,   // descriptive link text
+    "MD060": false,   // table pipe alignment
+    "MD007": { "indent": 2, "start_indented": false },
+    "MD025": { "front_matter_title": "" },   // one H1 per note; frontmatter title is not a heading
+    "MD026": { "punctuation": ".,;:!" },
+    "MD035": { "style": "---" }
+  },
+  "ignores": [
+    "_agents/**",
+    "_obsidian/**",
+    ".obsidian/**",
+    ".git/**",
+    "**/node_modules/**"
+  ]
+}

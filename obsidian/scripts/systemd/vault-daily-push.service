@@ -1,0 +1,8 @@
+# Linux: push committed vault work once a day. Copy this and vault-daily-push.timer to
+# ~/.config/systemd/user/, then: systemctl --user enable --now vault-daily-push.timer
+[Unit]
+Description=Push committed but unpushed Obsidian vault work
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/vault-daily-push

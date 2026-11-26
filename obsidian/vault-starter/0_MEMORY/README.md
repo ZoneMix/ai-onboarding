@@ -21,6 +21,7 @@ write it; none of it lives inside a single agent platform.
 - [[0_MEMORY/rules|rules]]: the correction log; every agent rereads it before each task.
 - [[0_MEMORY/decisions|decisions]]: my answers to past questions; check before asking me.
 - `Log/YYYY-MM.md`: dated history, newest at the bottom.
+- `_agents/` (vault root): the agents' own workspace for reports, feeds, queues and project build trees; see `_agents/README.md`.
 
 Add topic files as you need them (Projects, Infrastructure, Health, People, voice for how I
 write). Keep each one to one subject.

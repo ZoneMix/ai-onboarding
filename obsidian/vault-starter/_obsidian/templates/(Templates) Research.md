@@ -1,18 +1,18 @@
 ---
-title: (Templates) Research
-date_created: 2026-05-01
-description: 
+title: <% tp.file.title %>
+date_created: <% tp.date.now("YYYY-MM-DD") %>
+description: <% tp.system.prompt("One sentence: what question does this answer?") %>
 type: research
-domain: 
-reference: 
+domain: <% tp.system.suggester(["study", "reading", "home", "projects", "personal", "operations"], ["study", "reading", "home", "projects", "personal", "operations"], false, "Domain") %>
 ---
-
-# (Templates) Research
+# <% tp.file.title %>
 
 ## Question
 
+<% tp.file.cursor() %>
+
 ## Findings
 
-## Open Questions
+## Sources
 
-## References
+Each source with author, title, outlet, date and link, and what it shows.

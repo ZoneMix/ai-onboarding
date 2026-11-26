@@ -1,26 +1,21 @@
 ---
-title: (Templates) Project
-date_created: 2026-05-01
-description: 
+title: <% tp.file.title %>
+date_created: <% tp.date.now("YYYY-MM-DD") %>
+description: <% tp.system.prompt("One sentence: what is this project?") %>
 type: project
+domain: <% tp.system.suggester(["projects", "home", "study", "personal", "operations"], ["projects", "home", "study", "personal", "operations"], false, "Domain") %>
 status: active
-domain: 
-reference: 
 ---
-
-# (Templates) Project
+# <% tp.file.title %>
 
 ## Overview
 
+<% tp.file.cursor() %>
+
 ## Goals
-- [ ] 
 
-## Key Notes
+## Next steps
 
-## Tasks
-- [ ] 
+## Notes
 
-## Log
-
-### 2026-05-01
-- Project created
+Agent research, logs and build files for this project go in `_agents/projects/`, not here.
