@@ -1,9 +1,9 @@
 ---
 title: <% tp.file.title %>
 date_created: <% tp.date.now("YYYY-MM-DD") %>
-description: <% tp.system.prompt("One sentence: what is this project?") %>
+description: <% await tp.system.prompt("One sentence: what is this project?") %>
 type: project
-domain: <% tp.system.suggester(["projects", "home", "study", "personal", "operations"], ["projects", "home", "study", "personal", "operations"], false, "Domain") %>
+domain: <% await tp.system.suggester(["projects", "home", "study", "personal", "operations"], ["projects", "home", "study", "personal", "operations"], false, "Domain") %>
 status: active
 ---
 # <% tp.file.title %>

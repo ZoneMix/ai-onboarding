@@ -214,7 +214,14 @@ fill_vault() {  # fill_vault <starter dir> <vault dir> <label>: add the starter'
   [ "$DRY_RUN" = 1 ] && return 0
   [ -f "$dir/.githooks/pre-commit" ] && chmod +x "$dir/.githooks/pre-commit"
   if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
-    if ask_yn "  Turn on the vault pre-commit hook (gitleaks, size cap) for $dir now?" y; then
+    local current
+    current="$(git -C "$dir" config --get core.hooksPath || true)"
+    if [ -n "$current" ] && [ "$current" != ".githooks" ]; then
+      say "  kept       core.hooksPath=$current in $dir (set it to .githooks yourself to use the vault hook)"
+    elif ! command -v gitleaks >/dev/null 2>&1 && [ ! -x /opt/homebrew/bin/gitleaks ] && [ ! -x /usr/local/bin/gitleaks ]; then
+      say "  skipped    the vault hook: it needs gitleaks, which is not installed (it would block every commit)."
+      say "  Install gitleaks, then: git -C \"$dir\" config core.hooksPath .githooks"
+    elif ask_yn "  Turn on the vault pre-commit hook (gitleaks, size cap) for $dir now?" y; then
       git -C "$dir" config core.hooksPath .githooks
       say "  set        core.hooksPath=.githooks in $dir"
     fi

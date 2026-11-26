@@ -70,8 +70,9 @@ It will show you the options, preview the changes and install what you choose.
 ## Requirements
 
 macOS or Linux, bash, Python 3.9+, `jq` and `git`. Claude Code for the hooks, settings and
-skills; the rules work with any agent that reads `AGENTS.md`. Optional: `gitleaks` for secret
-scans.
+skills; the rules work with any agent that reads `AGENTS.md`. `gitleaks` for secret scans:
+optional for the Claude hooks, required by the vault pre-commit hook (the installer only turns
+that hook on when gitleaks is installed).
 
 ## License
 
